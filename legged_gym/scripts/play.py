@@ -46,12 +46,13 @@ def play(args):
     env_cfg.terrain.num_rows = 5
     env_cfg.terrain.num_cols = 5
     env_cfg.terrain.curriculum = False
+    env_cfg.commands.curriculum = False
     env_cfg.noise.add_noise = False
     env_cfg.domain_rand.randomize_friction = False
     env_cfg.domain_rand.push_robots = False
 
     # prepare environment
-    env, _ = task_registry.make_env(name=args.task, args=args, env_cfg=env_cfg)
+    env, _ = task_registry.make_env(name=args.task, args=args)
     obs = env.get_observations()
     # load policy
     train_cfg.runner.resume = True

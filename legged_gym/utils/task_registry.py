@@ -87,14 +87,17 @@ class TaskRegistry():
             raise ValueError(f"Task with name: {name} was not registered")
         if env_cfg is None:
             # load config files
-            env_cfg, _ = self.get_cfgs(name)
+            env_cfg, cfg_train = self.get_cfgs(name)
         # override cfg from args (if specified)
-        env_cfg, _ = update_cfg_from_args(env_cfg, None, args)
+        env_cfg, cfg_train = update_cfg_from_args(env_cfg, cfg_train, args)
         set_seed(env_cfg.seed)
         # parse sim params (convert to dict first)
         sim_params = {"sim": class_to_dict(env_cfg.sim)}
         sim_params = parse_sim_params(args, sim_params)
+        # print(env_cfg)
+        # print(cfg_train)
         env = task_class(   cfg=env_cfg,
+                            cfg_train=cfg_train,
                             sim_params=sim_params,
                             physics_engine=args.physics_engine,
                             sim_device=args.sim_device,

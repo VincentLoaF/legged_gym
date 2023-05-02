@@ -145,7 +145,8 @@ class LeggedRobotCfg(BaseConfig):
             action_rate = -0.01
             stand_still = -0.
 
-        only_positive_rewards = True # if true negative total rewards are clipped at zero (avoids early termination problems)
+        only_positive_rewards = False # if true negative total rewards are clipped at zero (avoids early termination problems)
+        reward_curriculum = True
         tracking_sigma = 0.25 # tracking reward = exp(-error^2/sigma)
         soft_dof_pos_limit = 1. # percentage of urdf limits, values above this limit are penalized
         soft_dof_vel_limit = 1.
@@ -177,8 +178,8 @@ class LeggedRobotCfg(BaseConfig):
     # viewer camera:
     class viewer:
         ref_env = 0
-        pos = [10, 0, 6]  # [m]
-        lookat = [11., 5, 3.]  # [m]
+        pos = [9, 1, 3]  # [m]
+        lookat = [7., 3., 1]  # [m]
 
     class sim:
         dt =  0.005

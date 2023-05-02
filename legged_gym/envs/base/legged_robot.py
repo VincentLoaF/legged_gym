@@ -46,10 +46,10 @@ from legged_gym.envs.base.base_task import BaseTask
 from legged_gym.utils.terrain import Terrain
 from legged_gym.utils.math import quat_apply_yaw, wrap_to_pi, torch_rand_sqrt_float
 from legged_gym.utils.helpers import class_to_dict
-from .legged_robot_config import LeggedRobotCfg
+from .legged_robot_config import LeggedRobotCfg, LeggedRobotCfgPPO
 
 class LeggedRobot(BaseTask):
-    def __init__(self, cfg: LeggedRobotCfg, sim_params, physics_engine, sim_device, headless):
+    def __init__(self, cfg: LeggedRobotCfg, cfg_train: LeggedRobotCfgPPO, sim_params, physics_engine, sim_device, headless):
         """ Parses the provided config file,
             calls create_sim() (which creates, simulation, terrain and environments),
             initilizes pytorch buffers used during training
@@ -63,12 +63,13 @@ class LeggedRobot(BaseTask):
             headless (bool): Run without rendering if True
         """
         self.cfg = cfg
+        self.cfg_train = cfg_train
         self.sim_params = sim_params
         self.height_samples = None
         self.debug_viz = False
         self.init_done = False
         self._parse_cfg(self.cfg)
-        super().__init__(self.cfg, sim_params, physics_engine, sim_device, headless)
+        super().__init__(self.cfg, self.cfg_train, sim_params, physics_engine, sim_device, headless)
 
         if not self.headless:
             self.set_camera(self.cfg.viewer.pos, self.cfg.viewer.lookat)
@@ -815,10 +816,12 @@ class LeggedRobot(BaseTask):
     #------------ reward functions----------------
     def _reward_lin_vel_z(self):
         # Penalize z axis base linear velocity
+        # UsedUsedUsedUsedUsedUsedUsedUsedUsedUsed
         return torch.square(self.base_lin_vel[:, 2])
     
     def _reward_ang_vel_xy(self):
         # Penalize xy axes base angular velocity
+        # UsedUsedUsedUsedUsedUsedUsedUsedUsedUsed
         return torch.sum(torch.square(self.base_ang_vel[:, :2]), dim=1)
     
     def _reward_orientation(self):
@@ -832,6 +835,7 @@ class LeggedRobot(BaseTask):
     
     def _reward_torques(self):
         # Penalize torques
+        # UsedUsedUsedUsedUsedUsedUsedUsedUsedUsed
         return torch.sum(torch.square(self.torques), dim=1)
 
     def _reward_dof_vel(self):
@@ -840,14 +844,17 @@ class LeggedRobot(BaseTask):
     
     def _reward_dof_acc(self):
         # Penalize dof accelerations
+        # UsedUsedUsedUsedUsedUsedUsedUsedUsedUsed
         return torch.sum(torch.square((self.last_dof_vel - self.dof_vel) / self.dt), dim=1)
     
     def _reward_action_rate(self):
         # Penalize changes in actions
+        # UsedUsedUsedUsedUsedUsedUsedUsedUsedUsed
         return torch.sum(torch.square(self.last_actions - self.actions), dim=1)
     
     def _reward_collision(self):
         # Penalize collisions on selected bodies
+        # UsedUsedUsedUsedUsedUsedUsedUsedUsedUsed
         return torch.sum(1.*(torch.norm(self.contact_forces[:, self.penalised_contact_indices, :], dim=-1) > 0.1), dim=1)
     
     def _reward_termination(self):
@@ -871,17 +878,20 @@ class LeggedRobot(BaseTask):
 
     def _reward_tracking_lin_vel(self):
         # Tracking of linear velocity commands (xy axes)
+        # UsedUsedUsedUsedUsedUsedUsedUsedUsedUsed
         lin_vel_error = torch.sum(torch.square(self.commands[:, :2] - self.base_lin_vel[:, :2]), dim=1)
         return torch.exp(-lin_vel_error/self.cfg.rewards.tracking_sigma)
     
     def _reward_tracking_ang_vel(self):
-        # Tracking of angular velocity commands (yaw) 
+        # Tracking of angular velocity commands (yaw)
+        # UsedUsedUsedUsedUsedUsedUsedUsedUsedUsed
         ang_vel_error = torch.square(self.commands[:, 2] - self.base_ang_vel[:, 2])
         return torch.exp(-ang_vel_error/self.cfg.rewards.tracking_sigma)
 
     def _reward_feet_air_time(self):
         # Reward long steps
         # Need to filter the contacts because the contact reporting of PhysX is unreliable on meshes
+        # UsedUsedUsedUsedUsedUsedUsedUsedUsedUsed
         contact = self.contact_forces[:, self.feet_indices, 2] > 1.
         contact_filt = torch.logical_or(contact, self.last_contacts) 
         self.last_contacts = contact
